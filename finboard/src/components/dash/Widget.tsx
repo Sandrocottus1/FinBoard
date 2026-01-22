@@ -57,10 +57,10 @@ export default function Widget({ cfg }: Props) {
     <div
       ref={setNodeRef}
       style={style}
-      className="bg-white dark:bg-gray-900 border dark:border-gray-700 rounded-lg shadow-sm flex flex-col h-64 overflow-hidden relative"
+      className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm flex flex-col h-64 overflow-hidden relative transition-colors duration-300"
     >
       {/* Header (Drag Handle) */}
-      <div className="flex items-center justify-between p-2 border-b dark:border-gray-800 bg-gray-50 dark:bg-gray-950">
+      <div className="flex items-center justify-between p-2 border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-950 transition-colors duration-300">
         <div 
           {...attributes} 
           {...listeners} 

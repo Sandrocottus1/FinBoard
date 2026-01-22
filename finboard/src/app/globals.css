@@ -1,1 +1,10 @@
 @import "tailwindcss";
+
+/* Explicit dark mode styles as fallback */
+html.dark {
+  color-scheme: dark;
+}
+
+html {
+  color-scheme: light;
+}

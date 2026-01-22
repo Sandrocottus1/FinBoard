@@ -1,10 +1,19 @@
 import type { Metadata } from "next";
-import "./globals.css"; // <--- This imports the styles we just added above
+import "./globals.css";
 
 export const metadata: Metadata = {
   title: "FinBoard",
   description: "Internship Assignment",
 };
+
+const themeScript = `
+  try {
+    const theme = localStorage.getItem('theme');
+    if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+    }
+  } catch (e) {}
+`;
 
 export default function RootLayout({
   children,
@@ -12,9 +21,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      {/* These classes set the default background color for the whole app */}
-      <body className="bg-gray-50 dark:bg-black text-gray-900 dark:text-gray-100 min-h-screen">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
+      <body className="bg-white dark:bg-black text-gray-900 dark:text-gray-100 min-h-screen transition-colors duration-300">
         {children}
       </body>
     </html>
