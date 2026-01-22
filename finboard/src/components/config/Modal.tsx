@@ -17,7 +17,7 @@ export default function Modal({ close }: Props) {
   
   // Form State
   const [name, setName] = useState('');
-  const [url, setUrl] = useState('https://api.coindesk.com/v1/bpi/currentprice.json');
+  const [url, setUrl] = useState('https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=BTC&apikey=XKO8UGM5K3MPSRP3');
   const [type, setType] = useState<WType>('card');
   const [freq, setFreq] = useState(30);
   const [map, setMap] = useState<any>({});

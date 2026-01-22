@@ -4,23 +4,57 @@ const cache = new Map<string, { d: any; t: number }>();
 
 export const getApi = async (url: string) => {
   const now = Date.now();
+  
+  // 1. CHECK CACHE
   if (cache.has(url)) {
     const c = cache.get(url)!;
-    if (now - c.t < 5000) return c.d; // 5s cache
+    // CRITICAL: Cache for 60 seconds (60000ms) to respect Alpha Vantage limits
+    if (now - c.t < 60000) { 
+      console.log('Returning cached data');
+      return c.d; 
+    }
   }
 
   try {
-    const res = await axios.get(url);
+    // 2. CALL PROXY
+    // We append the API key in the URL itself in the frontend for simplicity
+    const res = await axios.get(`/api/proxy?url=${encodeURIComponent(url)}`);
+    
+    // 3. HANDLE API LIMIT ERRORS
+    // Alpha Vantage sends a 200 OK even on error, but with a specific message
+    if (res.data.Note || res.data.Information) {
+      console.warn("API Limit Reached:", res.data);
+      // Return old cache if available, otherwise null
+      return cache.has(url) ? cache.get(url)!.d : null;
+    }
+
     cache.set(url, { d: res.data, t: now });
     return res.data;
   } catch (e) {
-    console.error(e);
+    console.error("API Error", e);
     return null;
   }
 };
 
-// Helper to find nested value (e.g. "data.price")
+// IMPROVED HELPER: Handles keys with spaces or dots (common in Alpha Vantage)
+// Helper to extract nested keys, specifically fixing Alpha Vantage's "05. price" issue
 export const getVal = (obj: any, path: string) => {
   if (!path) return null;
-  return path.split('.').reduce((o, k) => (o || {})[k], obj);
+  
+  // 1. Try standard dot notation first (Works for CoinGecko, etc.)
+  let res = path.split('.').reduce((o, k) => (o || {})[k], obj);
+  if (res !== undefined) return res;
+
+  // 2. Fallback for Alpha Vantage (Keys like "Global Quote.05. price")
+  // We try to access "Global Quote" first, then look for the weird key
+  if (path.includes('Global Quote')) {
+    const root = obj['Global Quote'];
+    if (root) {
+      // Extract the part after "Global Quote."
+      const key = path.replace('Global Quote.', '');
+      return root[key];
+    }
+  }
+
+  return null;
 };
