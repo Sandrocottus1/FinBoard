@@ -10,7 +10,6 @@ export const getApi = async (url: string) => {
     const c = cache.get(url)!;
     // CRITICAL: Cache for 60 seconds (60000ms) to respect Alpha Vantage limits
     if (now - c.t < 80000) { 
-      console.log('Returning cached data');
       return c.d; 
     }
   }
@@ -23,7 +22,6 @@ export const getApi = async (url: string) => {
     // 3. HANDLE API LIMIT ERRORS
     // Alpha Vantage sends a 200 OK even on error, but with a specific message
     if (res.data.Note || res.data.Information) {
-      console.warn("API Limit Reached:", res.data);
       // Return old cache if available, otherwise null
       return cache.has(url) ? cache.get(url)!.d : null;
     }
@@ -31,7 +29,6 @@ export const getApi = async (url: string) => {
     cache.set(url, { d: res.data, t: now });
     return res.data;
   } catch (e) {
-    console.error("API Error", e);
     return null;
   }
 };
