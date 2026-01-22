@@ -1,100 +1,86 @@
 'use client';
-
-import { useState, useEffect, useCallback } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { Trash2, GripHorizontal } from 'lucide-react';
-import { WCfg } from '@/lib/types';
-import { getApi } from '@/lib/api';
+import { Trash2, GripVertical } from 'lucide-react';
 import { useStore } from '@/lib/store';
-import Card from '../viz/Card';
-import Chart from '../viz/Chart';
-import Table from '../viz/Table';
+import { WCfg } from '@/lib/types';
+import Card from '@/components/viz/Card';
+import Table from '@/components/viz/Table';
+import Chart from '@/components/viz/Chart';
+import { useEffect, useState } from 'react';
+import { getApi } from '@/lib/api';
 
 interface Props {
   cfg: WCfg;
 }
 
 export default function Widget({ cfg }: Props) {
+  const remove = useStore((s) => s.remove);
   const [data, setData] = useState<any>(null);
-  const [loading, setLoading] = useState(false);
-  const remove = useStore((state) => state.del);
+  const [loading, setLoading] = useState(true);
 
-  // Drag and Drop Hooks
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: cfg.id });
-
+  // Drag and Drop hooks
+  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: cfg.id });
+  
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    zIndex: isDragging ? 10 : 1,
-    opacity: isDragging ? 0.5 : 1,
   };
 
-  // Data Fetching Logic
-  const fetchData = useCallback(async () => {
-    setLoading(true);
-    const res = await getApi(cfg.url);
-    if (res) setData(res);
-    setLoading(false);
-  }, [cfg.url]);
-
   useEffect(() => {
+    let mounted = true;
+    const fetchData = async () => {
+      setLoading(true);
+      const res = await getApi(cfg.url);
+      if (mounted) {
+        setData(res);
+        setLoading(false);
+      }
+    };
+
     fetchData();
-    if (cfg.freq > 0) {
-      const interval = setInterval(fetchData, cfg.freq * 1000);
-      return () => clearInterval(interval);
-    }
-  }, [fetchData, cfg.freq]);
+    const interval = setInterval(fetchData, (cfg.freq || 30) * 1000);
+    return () => { mounted = false; clearInterval(interval); };
+  }, [cfg.url, cfg.freq]);
 
   return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm flex flex-col h-64 overflow-hidden relative transition-colors duration-300"
+    <div 
+      ref={setNodeRef} 
+      style={style} 
+      className="
+        relative rounded-xl flex flex-col h-64 overflow-hidden group
+        bg-white dark:bg-gray-900 
+        border border-gray-200 dark:border-gray-800
+        shadow-sm dark:shadow-none
+        transition-colors duration-300
+      "
     >
-      {/* Header (Drag Handle) */}
-      <div className="flex items-center justify-between p-2 border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-950 transition-colors duration-300">
-        <div 
-          {...attributes} 
-          {...listeners} 
-          className="cursor-move p-1 text-gray-400 hover:text-gray-600"
-        >
-          <GripHorizontal size={16} />
+      {/* Header */}
+      <div className="p-3 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center bg-gray-50/50 dark:bg-gray-800/50">
+        <div className="flex items-center gap-2 cursor-grab active:cursor-grabbing text-gray-400" {...attributes} {...listeners}>
+          <GripVertical size={16} />
+          <h3 className="font-semibold text-xs uppercase tracking-wider text-gray-600 dark:text-gray-300 truncate max-w-[150px]">
+            {cfg.name}
+          </h3>
         </div>
-        <span className="text-xs font-semibold uppercase tracking-wider text-gray-500 truncate px-2">
-          {cfg.name}
-        </span>
-        <button 
-          onClick={() => remove(cfg.id)}
-          className="p-1 text-gray-400 hover:text-red-500 transition-colors"
-        >
-          <Trash2 size={14} />
+        <button onClick={() => remove(cfg.id)} className="text-gray-400 hover:text-red-500 transition-colors">
+          <Trash2 size={16} />
         </button>
       </div>
 
-      {/* Content Area */}
+      {/* Content */}
       <div className="flex-1 p-4 overflow-hidden relative">
-        {loading && !data && (
-          <div className="absolute inset-0 flex items-center justify-center bg-white/50 dark:bg-black/50 z-10">
-            <span className="text-xs animate-pulse">Loading...</span>
+        {loading ? (
+          <div className="absolute inset-0 flex items-center justify-center text-xs text-gray-400 animate-pulse">
+            Loading...
           </div>
-        )}
-        
-        {data ? (
-          <>
-            {cfg.type === 'card' && <Card data={data} map={cfg.map} />}
-            {cfg.type === 'chart' && <Chart data={data} map={cfg.map} />}
-            {cfg.type === 'table' && <Table data={data} map={cfg.map} />}
-          </>
         ) : (
-          !loading && <div className="text-xs text-gray-400 text-center mt-10">No Data</div>
+          <>
+            {!data && <div className="text-center text-gray-500 text-xs mt-10">No Data</div>}
+            {data && cfg.type === 'card' && <Card data={data} map={cfg.map} />}
+            {data && cfg.type === 'table' && <Table data={data} map={cfg.map} />}
+            {data && cfg.type === 'chart' && <Chart data={data} map={cfg.map} />}
+          </>
         )}
       </div>
     </div>
