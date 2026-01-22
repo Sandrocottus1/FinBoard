@@ -9,7 +9,7 @@ export const getApi = async (url: string) => {
   if (cache.has(url)) {
     const c = cache.get(url)!;
     // CRITICAL: Cache for 60 seconds (60000ms) to respect Alpha Vantage limits
-    if (now - c.t < 60000) { 
+    if (now - c.t < 80000) { 
       console.log('Returning cached data');
       return c.d; 
     }
