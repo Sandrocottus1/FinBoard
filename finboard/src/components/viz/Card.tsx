@@ -1,8 +1,9 @@
 import { getVal } from '@/lib/api';
+import { WMap } from '@/lib/types'; // Import this
 
 interface Props {
   data: any;
-  map: { val?: string; lbl?: string };
+  map: WMap; // Use the shared type
 }
 
 export default function Card({ data, map }: Props) {

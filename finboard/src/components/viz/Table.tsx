@@ -1,12 +1,12 @@
 import { getVal } from '@/lib/api';
+import { WMap } from '@/lib/types'; // Import this
 
 interface Props {
   data: any;
-  map: { cols?: string[] };
+  map: WMap; // Use the shared type
 }
 
 export default function Table({ data, map }: Props) {
-  // Try to find the array in the response (common in financial APIs)
   const list = Array.isArray(data) ? data : (getVal(data, 'items') || getVal(data, 'data') || []);
   const cols = map.cols || [];
 

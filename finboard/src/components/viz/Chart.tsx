@@ -1,14 +1,14 @@
 'use client';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip } from 'recharts';
 import { getVal } from '@/lib/api';
+import { WMap } from '@/lib/types'; // Import this
 
 interface Props {
   data: any;
-  map: { x?: string; y?: string };
+  map: WMap; // Use the shared type
 }
 
 export default function Chart({ data, map }: Props) {
-  // Ensure data is an array for the chart
   const chartData = Array.isArray(data) ? data : (getVal(data, 'data') || []);
 
   if (!chartData.length) return <div className="text-center p-4">No Chart Data</div>;
