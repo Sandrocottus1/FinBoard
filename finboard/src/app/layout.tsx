@@ -13,7 +13,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      {/* Light: Light Gray Background | Dark: Deep Black Background */}
       <body className="bg-gray-100 dark:bg-black text-gray-900 dark:text-gray-100 min-h-screen transition-colors duration-300">
         {children}
       </body>
