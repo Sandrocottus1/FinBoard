@@ -52,20 +52,31 @@ export default function ThemeToggle() {
   }
 
   return (
-    <button 
-      onClick={toggle} 
-      className="p-2 rounded-full transition-colors"
-      style={{
-        backgroundColor: dark ? '#1f2937' : '#e5e7eb',
-        cursor: 'pointer'
-      }}
-      aria-label="Toggle theme"
-    >
-      {dark ? (
-        <Sun size={20} style={{ color: '#fbbf24' }} />
-      ) : (
-        <Moon size={20} style={{ color: '#4b5563' }} />
-      )}
-    </button>
+    <button
+  onClick={toggle}
+  className="relative w-10 h-10 rounded-full transition-colors flex items-center justify-center"
+  style={{
+    backgroundColor: dark ? '#1f2937' : '#e5e7eb',
+    cursor: 'pointer'
+  }}
+  aria-label="Toggle theme"
+>
+  {/* Sun */}
+  <Sun
+  size={20}
+  className={`absolute transition-all transition-transform duration-200 ${
+    dark ? 'opacity-100 scale-100 rotate-0' : 'opacity-0 scale-75 rotate-90'
+  }`}
+  style={{ color: '#fbbf24' }}
+/>
+
+<Moon
+  size={20}
+  className={`absolute transition-all transition-transform duration-200 ${
+    dark ? 'opacity-0 scale-75 -rotate-90' : 'opacity-100 scale-100 rotate-0'
+  }`}
+  style={{ color: '#4b5563' }}
+/>
+</button>
   );
 }
