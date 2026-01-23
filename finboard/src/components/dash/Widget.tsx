@@ -16,6 +16,8 @@ interface Props {
   cfg: WCfg;
 }
 
+const DEFAULT_REFRESH_RATE = 30
+
 export default function Widget({ cfg }: Props) {
   const remove = useStore((s) => s.remove);
   const [data, setData] = useState<any>(null);
@@ -42,7 +44,7 @@ export default function Widget({ cfg }: Props) {
     };
 
     fetchData();
-    const interval = setInterval(fetchData, (cfg.freq || 30) * 1000);
+    const interval = setInterval(fetchData, (cfg.freq || DEFAULT_REFRESH_RATE) * 1000);
     return () => { mounted = false; clearInterval(interval); };
   }, [cfg.url, cfg.freq ,cfg.type]);
 
