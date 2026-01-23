@@ -5,6 +5,7 @@ const RATE_LIMITS: Record<string, number> = {
   'binance.com': 500,    // Wait 500ms between Binance calls
   'coingecko.com': 5000, // CoinGecko Free Tier is strict (wait 5s)
   'coincap.io': 1000,    // Wait 1s
+  'finnhub.io': 1500     
 };
 
 // Track the timestamp of the last request per domain
