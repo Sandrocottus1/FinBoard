@@ -11,7 +11,6 @@ export default function ThemeToggle() {
     
     // Check localStorage first, then system preference
     const savedTheme = localStorage.getItem('theme');
-    console.log('Saved theme:', savedTheme);
     
     if (savedTheme === 'dark') {
       setDark(true);
