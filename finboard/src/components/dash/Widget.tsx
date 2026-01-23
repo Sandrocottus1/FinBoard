@@ -30,6 +30,7 @@ export default function Widget({ cfg }: Props) {
   };
 
   useEffect(() => {
+    if(cfg.type==='socket')return ;
     let mounted = true;
     const fetchData = async () => {
       setLoading(true);
@@ -43,7 +44,7 @@ export default function Widget({ cfg }: Props) {
     fetchData();
     const interval = setInterval(fetchData, (cfg.freq || 30) * 1000);
     return () => { mounted = false; clearInterval(interval); };
-  }, [cfg.url, cfg.freq]);
+  }, [cfg.url, cfg.freq ,cfg.type]);
 
   return (
     <div 

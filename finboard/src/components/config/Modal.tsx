@@ -1,233 +1,234 @@
 'use client';
 import { useState } from 'react';
-import { X, Play, Save } from 'lucide-react';
 import { useStore } from '@/lib/store';
+import { WCfg } from '@/lib/types';
+import { X, Play, Plus, Loader2 } from 'lucide-react';
 import { getApi } from '@/lib/api';
-import { WCfg, WType } from '@/lib/types';
 
 interface Props {
   close: () => void;
 }
 
+const getKeys = (obj: any, prefix = ''): string[] => {
+  if (!obj || typeof obj !== 'object') return [];
+  return Object.keys(obj).reduce((acc: string[], k) => {
+    const pre = prefix ? `${prefix}.${k}` : k;
+    if (typeof obj[k] === 'object' && obj[k] !== null && !Array.isArray(obj[k])) {
+      return [...acc, ...getKeys(obj[k], pre)];
+    }
+    return [...acc, pre];
+  }, []);
+};
+
 export default function Modal({ close }: Props) {
   const add = useStore((s) => s.add);
-  const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [keys, setKeys] = useState<string[]>([]);
   
-  // Form State
-  const [name, setName] = useState('');
-  const [url, setUrl] = useState('');
-  const [type, setType] = useState<WType>('card');
-  const [freq, setFreq] = useState(30);
-  const [map, setMap] = useState<any>({});
+  const [widget, setWidget] = useState<Partial<WCfg>>({
+    name: '',
+    type: 'card',
+    url: '',
+    freq: 30,
+    map: {}
+  });
 
-  // Helper: Flatten JSON keys for the dropdown
-  const getKeys = (obj: any, prefix = ''): string[] => {
-    if (!obj || typeof obj !== 'object') return [];
-    return Object.keys(obj).reduce((acc: string[], k) => {
-      const pre = prefix ? `${prefix}.${k}` : k;
-      if (typeof obj[k] === 'object' && obj[k] !== null && !Array.isArray(obj[k])) {
-        return [...acc, ...getKeys(obj[k], pre)];
-      }
-      return [...acc, pre];
-    }, []);
-  };
+  const isSocket = widget.type === 'socket';
 
-  // Step 1: Fetch API & Parse Keys
-  // Step 1: Fetch API & Parse Keys
   const handleTest = async () => {
+    if (!widget.url) return;
     setLoading(true);
-    const data = await getApi(url);
+    
+    if (isSocket) {
+        setLoading(false);
+        return;
+    }
+
+    const data = await getApi(widget.url);
     setLoading(false);
     
     if (data) {
       let sample = data;
+      if (Array.isArray(data.prices)) sample = data.prices; 
+      else if (data.data && Array.isArray(data.data)) sample = data.data;
+      else if (Array.isArray(data)) sample = data;
 
-      // SMARTER UNWRAPPING LOGIC:
-      // 1. If it's CoinGecko (has 'prices'), grab that array
-      if (Array.isArray(data.prices)) {
-        sample = data.prices;
-      } 
-      // 2. If it's a standard API (has 'data' array), grab that
-      else if (data.data && Array.isArray(data.data)) {
-        sample = data.data;
-      }
-      // 3. If it's already an array, use it directly
-      else if (Array.isArray(data)) {
-        sample = data;
-      }
-
-      // Grab the first item from the array to guess the keys (or indices)
       const finalSample = Array.isArray(sample) ? sample[0] : sample;
-      
       setKeys(getKeys(finalSample));
-      setStep(2);
     } else {
-      alert('API Failed. Check URL or CORS.');
+      alert('API Failed. Check URL.');
     }
   };
 
-  const handleSave = () => {
-    const id = Date.now().toString();
-    add({ id, name, type, url, freq, map });
+  const handleCreate = () => {
+    if (!widget.name || !widget.url) return alert('Name and URL required');
+    
+    add({
+      id: Date.now().toString(),
+      name: widget.name,
+      type: widget.type as any,
+      url: widget.url,
+      freq: widget.freq || 30,
+      map: widget.map || {}
+    });
     close();
   };
 
-  // Helper for Table Multi-Select
-  const toggleCol = (k: string) => {
-    const current = map.cols || [];
-    const newCols = current.includes(k) 
-      ? current.filter((c: string) => c !== k)
-      : [...current, k];
-    setMap({ ...map, cols: newCols });
-  };
-
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white dark:bg-gray-900 w-full max-w-lg rounded-xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
-        {/* Header */}
-        <div className="p-4 border-b dark:border-gray-800 flex justify-between items-center">
-          <h2 className="font-bold text-lg">Add Widget</h2>
-          <button onClick={close}><X size={20} /></button>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+      <div className="bg-gray-900 border border-gray-800 w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden">
+        
+        <div className="p-4 border-b border-gray-800 flex justify-between items-center bg-gray-900">
+          <h2 className="text-lg font-bold text-white">Add Widget</h2>
+          <button onClick={close} className="text-gray-400 hover:text-white">
+            <X size={20} />
+          </button>
         </div>
 
-        <div className="p-6 space-y-4 overflow-y-auto">
-          {/* Common Fields */}
-          <div>
-            <label className="block text-xs font-semibold uppercase text-gray-500 mb-1">Widget Name</label>
+        <div className="p-6 space-y-6 max-h-[80vh] overflow-y-auto">
+          
+          <div className="space-y-1">
+            <label className="text-xs font-bold text-gray-500 uppercase">Widget Name</label>
             <input 
-              value={name} onChange={e => setName(e.target.value)} 
-              className="w-full p-2 border rounded dark:bg-gray-800 dark:border-gray-700" 
-              placeholder="e.g. Bitcoin Price"
+              className="w-full p-3 bg-gray-950 border border-gray-800 rounded-lg text-white outline-none focus:ring-2 focus:ring-blue-600"
+              placeholder="e.g. Market Leaderboard"
+              value={widget.name}
+              onChange={(e) => setWidget({ ...widget, name: e.target.value })}
             />
           </div>
 
-          {step === 1 && (
-            <>
-              <div>
-                <label className="block text-xs font-semibold uppercase text-gray-500 mb-1">API URL</label>
-                <div className="flex gap-2">
-                  <input 
-                    value={url} onChange={e => setUrl(e.target.value)} 
-                    className="w-full p-2 border rounded dark:bg-gray-800 dark:border-gray-700 text-sm font-mono"
-                    placeholder="https://api..."
-                  />
+          <div className="grid grid-cols-2 gap-4">
+             <div className="space-y-1">
+                <label className="text-xs font-bold text-gray-500 uppercase">Type</label>
+                <select 
+                  className="w-full p-3 bg-gray-950 border border-gray-800 rounded-lg text-white outline-none"
+                  value={widget.type}
+                  onChange={(e) => setWidget({ ...widget, type: e.target.value as any, map: {} })}
+                >
+                  <option value="card">Card (Single Metric)</option>
+                  <option value="table">Table (List)</option>
+                  <option value="chart">Chart (Graph)</option>
+                  <option value="socket">Socket (Real-time)</option>
+                </select>
+             </div>
+
+             <div className="space-y-1">
+                <label className="text-xs font-bold text-gray-500 uppercase">Refresh (Sec)</label>
+                <input 
+                  type="number"
+                  className="w-full p-3 bg-gray-950 border border-gray-800 rounded-lg text-white disabled:opacity-50"
+                  value={isSocket ? 0 : widget.freq}
+                  disabled={isSocket}
+                  onChange={(e) => setWidget({ ...widget, freq: Number(e.target.value) })}
+                />
+             </div>
+          </div>
+
+          <div className="space-y-1">
+            <label className="text-xs font-bold text-gray-500 uppercase">
+               {isSocket ? 'Coin ID' : 'API URL'}
+            </label>
+            <div className="flex gap-2">
+              <input 
+                className="flex-1 p-3 bg-gray-950 border border-gray-800 rounded-lg text-white font-mono text-sm outline-none"
+                placeholder={isSocket ? "bitcoin" : "https://api..."}
+                value={widget.url}
+                onChange={(e) => setWidget({ ...widget, url: e.target.value })}
+              />
+              {!isSocket && (
                   <button 
-                    onClick={handleTest} disabled={loading}
-                    className="bg-blue-600 text-white px-4 rounded hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2"
+                    onClick={handleTest}
+                    disabled={loading || !widget.url}
+                    className="px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold disabled:opacity-50 flex items-center gap-2"
                   >
-                   {loading ? '...' : <><Play size={16} /> Test</>}
+                    {loading ? <Loader2 size={18} className="animate-spin"/> : <Play size={18} />}
+                    Test
                   </button>
-                </div>
-                <p className="text-xs text-gray-400 mt-1">Click Test to load available fields.</p>
-              </div>
-            </>
-          )}
+              )}
+            </div>
+          </div>
 
-          {step === 2 && (
-            <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4">
-              <div className="flex gap-4">
-                <div className="flex-1">
-                  <label className="block text-xs font-semibold uppercase text-gray-500 mb-1">Type</label>
-                  <select 
-                    value={type} onChange={e => setType(e.target.value as WType)}
-                    className="w-full p-2 border rounded dark:bg-gray-800 dark:border-gray-700"
-                  >
-                    <option value="card">Card (Single Metric)</option>
-                    <option value="table">Table (List)</option>
-                    <option value="chart">Chart (Graph)</option>
-                    <option value="socket">Socket (Live Real-time)</option>
-                  </select>
-                </div>
-                <div className="w-24">
-                  <label className="block text-xs font-semibold uppercase text-gray-500 mb-1">Refresh (s)</label>
-                  <input 
-                    type="number" value={freq} onChange={e => setFreq(Number(e.target.value))}
-                    className="w-full p-2 border rounded dark:bg-gray-800 dark:border-gray-700"
-                  />
-                </div>
-              </div>
+          {!isSocket && keys.length > 0 && (
+            <div className="bg-gray-950 p-4 rounded-xl border border-gray-800 space-y-4">
+               <h3 className="text-sm font-semibold text-white border-b border-gray-800 pb-2">Map Data Fields</h3>
+               
+               {widget.type === 'card' && (
+                 <>
+                   <div>
+                     <label className="text-xs text-gray-500 uppercase">Label Field</label>
+                     <select className="w-full p-2 bg-gray-900 rounded border border-gray-800 text-sm text-gray-300" onChange={(e) => setWidget({...widget, map: {...widget.map, lbl: e.target.value}})}>
+                        <option value="">-- Select --</option>
+                        {keys.map(k => <option key={k} value={k}>{k}</option>)}
+                     </select>
+                   </div>
+                   <div>
+                     <label className="text-xs text-gray-500 uppercase">Value Field</label>
+                     <select className="w-full p-2 bg-gray-900 rounded border border-gray-800 text-sm text-gray-300" onChange={(e) => setWidget({...widget, map: {...widget.map, val: e.target.value}})}>
+                        <option value="">-- Select --</option>
+                        {keys.map(k => <option key={k} value={k}>{k}</option>)}
+                     </select>
+                   </div>
+                 </>
+               )}
 
-              {/* Dynamic Mappers based on Type */}
-              <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded border dark:border-gray-700">
-                <h3 className="text-sm font-bold mb-3">Map Data Fields</h3>
-                
-                {/* CARD CONFIG */}
-                {type === 'card' && (
+               {widget.type === 'chart' && (
                   <>
-                    <label className="text-xs text-gray-500">Value Field</label>
-                    <select 
-                      onChange={e => setMap({ ...map, val: e.target.value })}
-                      className="w-full p-2 mb-2 border rounded dark:bg-gray-700"
-                    >
-                      <option value="">-- Select Field --</option>
-                      {keys.map(k => <option key={k} value={k}>{k}</option>)}
-                    </select>
-                    
-                    <label className="text-xs text-gray-500">Label Field</label>
-                    <select 
-                      onChange={e => setMap({ ...map, lbl: e.target.value })}
-                      className="w-full p-2 border rounded dark:bg-gray-700"
-                    >
-                      <option value="">-- Select Field --</option>
-                      {keys.map(k => <option key={k} value={k}>{k}</option>)}
-                    </select>
+                   <div>
+                     <label className="text-xs text-gray-500 uppercase">X Axis (Time)</label>
+                     <select className="w-full p-2 bg-gray-900 rounded border border-gray-800 text-sm text-gray-300" onChange={(e) => setWidget({...widget, map: {...widget.map, x: e.target.value}})}>
+                        <option value="">-- Select --</option>
+                        {keys.map(k => <option key={k} value={k}>{k}</option>)}
+                     </select>
+                   </div>
+                   <div>
+                     <label className="text-xs text-gray-500 uppercase">Y Axis (Price)</label>
+                     <select className="w-full p-2 bg-gray-900 rounded border border-gray-800 text-sm text-gray-300" onChange={(e) => setWidget({...widget, map: {...widget.map, y: e.target.value}})}>
+                        <option value="">-- Select --</option>
+                        {keys.map(k => <option key={k} value={k}>{k}</option>)}
+                     </select>
+                   </div>
                   </>
-                )}
-
-                {/* TABLE CONFIG */}
-                {type === 'table' && (
-                  <>
-                    <label className="text-xs text-gray-500 mb-2 block">Select Columns to Display:</label>
-                    <div className="max-h-32 overflow-y-auto border rounded dark:border-gray-700 p-2 space-y-1 bg-white dark:bg-gray-900">
-                      {keys.map(k => (
-                        <label key={k} className="flex items-center gap-2 text-sm cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 p-1 rounded">
-                          <input 
-                            type="checkbox" 
-                            checked={(map.cols || []).includes(k)}
-                            onChange={() => toggleCol(k)}
-                          />
-                          {k}
-                        </label>
-                      ))}
-                    </div>
-                  </>
-                )}
-
-                {/* CHART CONFIG */}
-                {type === 'chart' && (
-                  <>
-                    <label className="text-xs text-gray-500">X Axis (Time/Label)</label>
-                    <select 
-                      onChange={e => setMap({ ...map, x: e.target.value })}
-                      className="w-full p-2 mb-2 border rounded dark:bg-gray-700"
-                    >
-                      <option value="">-- Select Field --</option>
-                      {keys.map(k => <option key={k} value={k}>{k}</option>)}
-                    </select>
-
-                    <label className="text-xs text-gray-500">Y Axis (Value)</label>
-                    <select 
-                      onChange={e => setMap({ ...map, y: e.target.value })}
-                      className="w-full p-2 border rounded dark:bg-gray-700"
-                    >
-                      <option value="">-- Select Field --</option>
-                      {keys.map(k => <option key={k} value={k}>{k}</option>)}
-                    </select>
-                  </>
-                )}
-              </div>
-
-              <button 
-                onClick={handleSave}
-                className="w-full bg-green-600 text-white p-3 rounded font-bold hover:bg-green-700 flex justify-center items-center gap-2"
-              >
-                <Save size={18} /> Create Widget
-              </button>
+               )}
+               
+               {/* --- NEW: TABLE COLUMN LOGIC --- */}
+               {widget.type === 'table' && (
+                 <div className="space-y-2">
+                   <label className="text-xs text-gray-500 uppercase">Select Columns</label>
+                   <div className="grid grid-cols-2 gap-2 max-h-32 overflow-y-auto p-2 bg-gray-900 rounded border border-gray-800">
+                     {keys.map((k) => (
+                       <label key={k} className="flex items-center gap-2 text-sm text-gray-300 cursor-pointer hover:text-white">
+                         <input 
+                           type="checkbox" 
+                           className="rounded border-gray-700 bg-gray-800 text-blue-600 focus:ring-0"
+                           checked={(widget.map?.cols || []).includes(k)}
+                           onChange={(e) => {
+                             const current = widget.map?.cols || [];
+                             const newCols = e.target.checked 
+                               ? [...current, k] 
+                               : current.filter((c: string) => c !== k);
+                             setWidget({...widget, map: {...widget.map, cols: newCols}});
+                           }}
+                         />
+                         <span className="truncate" title={k}>{k}</span>
+                       </label>
+                     ))}
+                   </div>
+                   <p className="text-[10px] text-gray-500">Check fields to show as table columns.</p>
+                 </div>
+               )}
             </div>
           )}
         </div>
+
+        <div className="p-4 border-t border-gray-800 bg-gray-900 flex justify-end">
+          <button 
+            onClick={handleCreate}
+            className="w-full py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl font-bold flex items-center justify-center gap-2"
+          >
+            <Plus size={20} /> Create Widget
+          </button>
+        </div>
+
       </div>
     </div>
   );
