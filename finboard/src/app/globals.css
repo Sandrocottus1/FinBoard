@@ -7,6 +7,9 @@
   }
 }
 
+/* This keeps the scrollbars correct 
+   but relies on the body tag above for the actual page color 
+*/
 html.dark {
   color-scheme: dark;
 }
