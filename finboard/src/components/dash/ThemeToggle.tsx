@@ -15,31 +15,25 @@ export default function ThemeToggle() {
     if (savedTheme === 'dark') {
       setDark(true);
       document.documentElement.classList.add('dark');
-      console.log('Applied dark mode from storage');
     } else if (savedTheme === 'light') {
       setDark(false);
       document.documentElement.classList.remove('dark');
-      console.log('Applied light mode from storage');
     } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
       setDark(true);
       document.documentElement.classList.add('dark');
-      console.log('Applied dark mode from system preference');
     }
   }, []);
 
   const toggle = () => {
     setDark(prevDark => {
       const newDark = !prevDark;
-      console.log('Toggle clicked, switching from', prevDark, 'to', newDark);
       
       if (newDark) {
         document.documentElement.classList.add('dark');
         localStorage.setItem('theme', 'dark');
-        console.log('Switched to dark mode');
       } else {
         document.documentElement.classList.remove('dark');
         localStorage.setItem('theme', 'light');
-        console.log('Switched to light mode');
       }
       return newDark;
     });
