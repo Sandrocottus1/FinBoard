@@ -62,7 +62,7 @@ export default function Widget({ cfg }: Props) {
     >
       {/* Header */}
       <div className="p-3 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center bg-gray-50/50 dark:bg-gray-800/50">
-        <div className="flex items-center gap-2 cursor-grab active:cursor-grabbing text-gray-400" {...attributes} {...listeners}>
+        <div className="flex items-center gap-2 cursor-grab active:cursor-grabbing text-gray-400 touch-none" {...attributes} {...listeners}>
           <GripVertical size={16} />
           <h3 className="font-semibold text-xs uppercase tracking-wider text-gray-600 dark:text-gray-300 truncate max-w-[150px]">
             {cfg.name}

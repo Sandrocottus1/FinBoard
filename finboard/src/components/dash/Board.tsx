@@ -1,11 +1,36 @@
 'use client';
-import { DndContext, closestCenter, DragEndEvent } from '@dnd-kit/core';
+
+// 1. ADD NEW IMPORTS
+import { 
+  DndContext, 
+  closestCenter, 
+  DragEndEvent,
+  useSensor,    // <--- Add this
+  useSensors,   // <--- Add this
+  MouseSensor,  // <--- Add this
+  TouchSensor   // <--- Add this
+} from '@dnd-kit/core';
+
 import { SortableContext, arrayMove, rectSortingStrategy } from '@dnd-kit/sortable';
 import { useStore } from '@/lib/store';
 import Widget from './Widget';
 
 export default function Board() {
   const { ws, reorder, add } = useStore();
+
+  // 2. DEFINE SENSORS (The Fix for Mobile)
+  const sensors = useSensors(
+    useSensor(MouseSensor), // Desktop (Instant drag)
+    useSensor(TouchSensor, {
+      // Mobile Config:
+      // User must hold finger for 250ms before drag starts.
+      // This prevents the widget from getting stuck when you just want to scroll.
+      activationConstraint: {
+        delay: 250, 
+        tolerance: 5,
+      },
+    })
+  );
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
@@ -16,42 +41,22 @@ export default function Board() {
       reorder(arrayMove(ws, oldIndex, newIndex));
     }
   };
+
   const loadTemplate = () => {
     const timestamp = Date.now();
-    
-    // 1. Bitcoin Price Card
-    add({
-      id: `${timestamp}-0`,
-      name: 'Live Bitcoin',
-      type: 'socket',       // <--- Special Type
-      url: 'bitcoin',       // <--- Coin Name
-      freq: 0,              // <--- No polling needed
-      map: {}
-    });
-
-    // 2. Crypto Leaderboard Table
-    add({
-      id: `${timestamp}-2`,
-      name: 'Market Leaderboard',
-      type: 'table',
-      url: 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin,ethereum,solana,cardano,ripple&order=market_cap_desc',
-      freq: 120,
-      map: { cols: ['name', 'current_price', 'price_change_percentage_24h'] }
-    });
-
-    // 3. Bitcoin Chart
-    add({
-      id: `${timestamp}-3`,
-      name: 'BTC Trend (30 Days)',
-      type: 'chart',
-      url: 'https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=30&interval=daily',
-      freq: 300,
-      map: { x: '0', y: '1' }
-    });
+    add({ id: `${timestamp}-0`, name: 'Live Bitcoin', type: 'socket', url: 'bitcoin', freq: 0, map: {} });
+    add({ id: `${timestamp}-2`, name: 'Market Leaderboard', type: 'table', url: 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin,ethereum,solana,cardano,ripple&order=market_cap_desc', freq: 120, map: { cols: ['name', 'current_price', 'price_change_percentage_24h'] } });
+    add({ id: `${timestamp}-3`, name: 'BTC Trend (30 Days)', type: 'chart', url: 'https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=30&interval=daily', freq: 300, map: { x: '0', y: '1' } });
   };
+
   return (
     <div className="w-full bg-white dark:bg-black transition-colors duration-300">
-      <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+      {/* 3. PASS THE SENSORS TO CONTEXT */}
+      <DndContext 
+        sensors={sensors}  // <--- Connect the sensors here
+        collisionDetection={closestCenter} 
+        onDragEnd={handleDragEnd}
+      >
         <SortableContext items={ws} strategy={rectSortingStrategy}>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {ws.map((w) => (

@@ -23,7 +23,7 @@ export default function RootLayout({
           } catch (e) {}
         ` }} />
       </head>
-      <body className="bg-white dark:bg-black text-gray-900 dark:text-gray-100 min-h-screen transition-colors duration-300">
+      <body className="bg-gray-100 dark:bg-black text-gray-900 dark:text-gray-100 min-h-screen transition-colors duration-300">
         {children}
       </body>
     </html>
