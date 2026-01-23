@@ -1,13 +1,12 @@
 # 🚀 FinBoard - Real-Time Financial Dashboard
 
 [![Live Demo](https://img.shields.io/badge/Live_Demo-Vercel-black?style=for-the-badge&logo=vercel)](https://fin-board-3s11w7rz6-aryan-yadavs-projects-c6d0c0d1.vercel.app/)
-[![Video Walkthrough](https://img.shields.io/badge/Video_Walkthrough-Loom-blue?style=for-the-badge&logo=loom)](https://your-loom-video-link)
 
 > **A high-performance, customizable dashboard for tracking crypto and stock markets in real-time.**
 
 FinBoard is a responsive, feature-rich frontend application built with **Next.js 15** and **Tailwind CSS**. It solves common dashboard challenges like **API rate limiting**, **mobile drag-and-drop interactions**, and **real-time WebSocket state management**.
 
-![Dashboard Screenshot](public/dashboard-preview.png)
+![Dashboard Screenshot](public/image.png)
 
 ---
 
@@ -51,5 +50,5 @@ FinBoard is a responsive, feature-rich frontend application built with **Next.js
 
 1. **Clone the repository**
    ```bash
-   git clone [https://github.com/yourusername/finboard.git](https://github.com/yourusername/finboard.git)
+   git clone [https://github.com/Sandrocottus1/finboard.git](https://github.com/Sandrocottus1/finboard.git)
    cd finboard
