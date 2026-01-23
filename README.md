@@ -6,7 +6,7 @@
 
 FinBoard is a responsive, feature-rich frontend application built with **Next.js 15** and **Tailwind CSS**. It solves common dashboard challenges like **API rate limiting**, **mobile drag-and-drop interactions**, and **real-time WebSocket state management**.
 
-![Dashboard Screenshot](public/image.png)
+![Dashboard Screenshot](finboard/public/image.png)
 
 ---
 
