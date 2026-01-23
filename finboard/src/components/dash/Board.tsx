@@ -3,7 +3,6 @@ import { DndContext, closestCenter, DragEndEvent } from '@dnd-kit/core';
 import { SortableContext, arrayMove, rectSortingStrategy } from '@dnd-kit/sortable';
 import { useStore } from '@/lib/store';
 import Widget from './Widget';
-import { WCfg } from '@/lib/types';
 
 export default function Board() {
   const { ws, reorder, add } = useStore();
