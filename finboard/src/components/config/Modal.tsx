@@ -137,6 +137,7 @@ export default function Modal({ close }: Props) {
                     <option value="card">Card (Single Metric)</option>
                     <option value="table">Table (List)</option>
                     <option value="chart">Chart (Graph)</option>
+                    <option value="socket">Socket (Live Real-time)</option>
                   </select>
                 </div>
                 <div className="w-24">

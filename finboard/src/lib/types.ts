@@ -11,7 +11,7 @@ export interface WMap {
 export interface WCfg {
   id: string;
   name: string;
-  type: WType;
+  type: 'card' | 'table' | 'chart' | 'socket';
   url: string;
   freq: number;       // Refresh interval
   map: WMap;          

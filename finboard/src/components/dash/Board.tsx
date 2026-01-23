@@ -22,12 +22,12 @@ export default function Board() {
     
     // 1. Bitcoin Price Card
     add({
-      id: `${timestamp}-1`,
-      name: 'Bitcoin Price',
-      type: 'card',
-      url: 'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd&include_24hr_change=true',
-      freq: 60,
-      map: { val: 'bitcoin.usd', lbl: 'bitcoin.usd_24h_change' }
+      id: `${timestamp}-0`,
+      name: 'Live Bitcoin',
+      type: 'socket',       // <--- Special Type
+      url: 'bitcoin',       // <--- Coin Name
+      freq: 0,              // <--- No polling needed
+      map: {}
     });
 
     // 2. Crypto Leaderboard Table

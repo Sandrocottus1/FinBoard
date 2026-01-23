@@ -9,6 +9,8 @@ import Table from '@/components/viz/Table';
 import Chart from '@/components/viz/Chart';
 import { useEffect, useState } from 'react';
 import { getApi } from '@/lib/api';
+import SocketCard from '../viz/SocketCard';
+
 
 interface Props {
   cfg: WCfg;
@@ -70,11 +72,14 @@ export default function Widget({ cfg }: Props) {
 
       {/* Content */}
       <div className="flex-1 p-4 overflow-hidden relative">
-        {loading ? (
+        {cfg.type === 'socket' ? (
+           <SocketCard coin={cfg.url} /> 
+        ) : loading ? (
           <div className="absolute inset-0 flex items-center justify-center text-xs text-gray-400 animate-pulse">
             Loading...
           </div>
         ) : (
+          /* ... existing conditions for card, table, chart ... */
           <>
             {!data && <div className="text-center text-gray-500 text-xs mt-10">No Data</div>}
             {data && cfg.type === 'card' && <Card data={data} map={cfg.map} />}
