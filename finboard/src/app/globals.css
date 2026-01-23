@@ -1,20 +1,16 @@
 @import "tailwindcss";
 
-@layer base {
-  body {
-    /* Light Mode: Soft Slate Gray (Not White) | Dark Mode: Deep Gray */
-    @apply bg-slate-100 text-slate-900 dark:bg-gray-950 dark:text-gray-100 antialiased transition-colors duration-300;
-  }
+@variant dark (&:where(.dark, .dark *));
+
+html {
+    scroll-behavior: smooth;
+    color-scheme: light;
 }
 
-/* This keeps the scrollbars correct 
-   but relies on the body tag above for the actual page color 
-*/
 html.dark {
   color-scheme: dark;
 }
 
 html {
   color-scheme: light;
-  scroll-behavior: smooth;
 }
