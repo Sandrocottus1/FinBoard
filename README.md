@@ -46,26 +46,24 @@ FinBoard is a responsive, feature-rich frontend application built with **Next.js
 - Node.js 18+
 - npm / yarn
 
-### Installation
+📦 Installation
+1. Clone the repository
+git clone https://github.com/Sandrocottus1/finboard.git
+cd finboard
 
-1. **Clone the repository**
-   ```bash
-   git clone [https://github.com/Sandrocottus1/finboard.git](https://github.com/Sandrocottus1/finboard.git)
-   cd finboard
-1. **Clone the repository**
-   ```bash
-   git clone [https://github.com/yourusername/finboard.git](https://github.com/yourusername/finboard.git)
-   cd finboard
-Install dependencies
-
-Bash
+2. Install dependencies
 npm install
-Set up Environment Variables Create a .env.local file in the root directory and add your API keys:
 
-Code snippet
+3. Set up environment variables
+
+Create a .env.local file in the root directory and add your API key:
+
 NEXT_PUBLIC_FINNHUB_API_KEY=your_api_key_here
-Run the development server
 
-Bash
+4. Run the development server
 npm run dev
+
+
+The application will be available at:
+👉 http://localhost:3000
 
