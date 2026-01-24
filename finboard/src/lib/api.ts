@@ -8,19 +8,19 @@ const RATE_LIMITS: Record<string, number> = {
   'finnhub.io': 1500     
 };
 
-// Track the timestamp of the last request per domain
+// Tracking the timestamp of the last request per domain
 const lastReqTime: Record<string, number> = {};
 
-// Helper: Sleep function
+// Sleep function
 const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
 export const getApi = async (url: string) => {
   const now = Date.now();
 
-  // 2. Check Cache First (Don't fetch if we have fresh data)
+  // 2. Checking Cache First (Don't fetch if we have fresh data)
   if (cache.has(url)) {
     const c = cache.get(url)!;
-    // Return cached data if it's less than 30 seconds old
+    // Returning cached data if it's less than 30 seconds old
     if (now - c.ts < 30 * 1000) {
       return c.data;
     }
@@ -28,7 +28,7 @@ export const getApi = async (url: string) => {
 
   // 3. Rate Limiting Logic
   try {
-    // Identify the domain (e.g., "api.binance.com")
+    // Identifying the domain (e.g., "api.binance.com")
     const domain = Object.keys(RATE_LIMITS).find((d) => url.includes(d));
     
     if (domain) {

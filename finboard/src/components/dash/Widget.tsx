@@ -34,35 +34,72 @@ export default function Widget({ cfg }: Props) {
   const [error, setError] = useState(false);
 
   useEffect(() => {
-    if(cfg.type==='socket')return ;
+    if (cfg.type === 'socket') return;
+    
     let mounted = true;
+
     const fetchData = async () => {
-      try{
-      setLoading(true);
-      setError(false);
-      const res = await getApi(cfg.url);
-      let finalData = res;
+      try {
+        setLoading(true);
+        setError(false);
+
+        const res = await getApi(cfg.url);
+        if (!res) throw new Error("No data");
+
+        let finalData = res;
+
+        // 1. Finnhub Charts
         if (res.c && res.t && Array.isArray(res.c)) {
-             finalData = res.t.map((timestamp: number, index: number) => ({
-                 x: new Date(timestamp * 1000).toLocaleDateString('en-US', { day: 'numeric', month: 'short' }),
-                 y: res.c[index] 
+             finalData = res.t.map((t: number, i: number) => ({
+                 x: new Date(t * 1000).toLocaleDateString('en-US', { day: 'numeric', month: 'short' }),
+                 y: res.c[i] 
              }));
         }
-      if (mounted) {
-        setData(res);
-      }
-      }catch(err){
+        if(typeof res.c === 'number'  && !Array.isArray(res.c)){
+          finalData = {
+            value: res.c, //curr price
+            change: res.dp //percent change
+          };
+        }
+        // 2. Alpha Vantage Stock Card (NEW)
+        if (res["Global Quote"]) {
+          const q = res["Global Quote"];
+          finalData = {
+            value: parseFloat(q["05. price"]),
+            change: parseFloat(q["10. change percent"].replace('%', ''))
+          };
+        }
+
+        // 3. Alpha Vantage Crypto Chart
+        const avCrypto = res['Time Series (Digital Currency Daily)'];
+        if (avCrypto) {
+            finalData = Object.keys(avCrypto).slice(0, 30).map(d => ({
+                x: new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+                y: parseFloat(avCrypto[d]['4a. close (USD)'])
+            })).reverse();
+        }
+
+        if (mounted) {
+          setData(finalData); 
+        }
+
+      } catch (err) {
         console.error(err);
-        if(mounted)setError(true);
-      }finally{
-        if(mounted)setLoading(false);
+        if (mounted) setError(true);
+      } finally {
+        if (mounted) setLoading(false);
       }
     };
 
     fetchData();
-    const interval = setInterval(fetchData, (cfg.freq || DEFAULT_REFRESH_RATE) * 1000);
-    return () => { mounted = false; clearInterval(interval); };
-  }, [cfg.url, cfg.freq ,cfg.type]);
+    // Default to 60s if freq is missing
+    const interval = setInterval(fetchData, (cfg.freq || 60) * 1000); 
+
+    return () => { 
+      mounted = false;
+      clearInterval(interval);
+    };
+  }, [cfg.url, cfg.freq, cfg.type]);
 
   return (
     <div 
