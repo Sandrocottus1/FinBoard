@@ -1,5 +1,5 @@
 'use client';
-import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
+import { ResponsiveContainer, AreaChart, Area, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 import { getVal } from '@/lib/api';
 import { WMap } from '@/lib/types';
 
@@ -56,7 +56,7 @@ export default function Chart({ data, map }: Props) {
             tick={{ fill: '#6b7280', fontSize: 10 }}
             tickLine={false}
             axisLine={false}
-            width={40}
+            width={45}
           />
 
           <Tooltip 
