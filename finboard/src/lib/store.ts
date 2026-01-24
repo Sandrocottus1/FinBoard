@@ -5,7 +5,7 @@ import { WCfg } from './types';
 interface Store {
   ws: WCfg[];
   add: (w: WCfg) => void;
-  remove: (id: string) => void; // <--- This line fixes the error
+  remove: (id: string) => void; 
   reorder: (ws: WCfg[]) => void;
 }
 

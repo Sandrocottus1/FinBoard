@@ -31,15 +31,31 @@ export default function Widget({ cfg }: Props) {
     transition,
   };
 
+  const [error, setError] = useState(false);
+
   useEffect(() => {
     if(cfg.type==='socket')return ;
     let mounted = true;
     const fetchData = async () => {
+      try{
       setLoading(true);
+      setError(false);
       const res = await getApi(cfg.url);
+      let finalData = res;
+        if (res.c && res.t && Array.isArray(res.c)) {
+             finalData = res.t.map((timestamp: number, index: number) => ({
+                 x: new Date(timestamp * 1000).toLocaleDateString('en-US', { day: 'numeric', month: 'short' }),
+                 y: res.c[index] 
+             }));
+        }
       if (mounted) {
         setData(res);
-        setLoading(false);
+      }
+      }catch(err){
+        console.error(err);
+        if(mounted)setError(true);
+      }finally{
+        if(mounted)setLoading(false);
       }
     };
 
@@ -78,11 +94,22 @@ export default function Widget({ cfg }: Props) {
         {cfg.type === 'socket' ? (
            <SocketCard coin={cfg.url} /> 
         ) : loading ? (
-          <div className="absolute inset-0 flex items-center justify-center text-xs text-gray-400 animate-pulse">
-            Loading...
+          <div className="animate-pulse flex flex-col justify-center h-full space-y-3">
+            <div className="h-5 bg-gray-200 dark:bg-gray-800 rounded w-3/4"></div>
+            <div className="h-8 bg-gray-200 dark:bg-gray-800 rounded w-full"></div>
+            <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded w-1/2"></div>
+          </div>
+        ) : error ? (
+          <div className="flex flex-col items-center justify-center h-full text-gray-400 gap-3">
+            <span className="text-xs">Connection Failed</span>
+            <button 
+              onClick={() => window.location.reload()} // Simple reload or call fetchData if accessible
+              className="text-xs bg-gray-100 dark:bg-gray-800 px-3 py-1.5 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors font-medium"
+            >
+              Retry
+            </button>
           </div>
         ) : (
-          /* ... existing conditions for card, table, chart ... */
           <>
             {!data && <div className="text-center text-gray-500 text-xs mt-10">No Data</div>}
             {data && cfg.type === 'card' && <Card data={data} map={cfg.map} />}

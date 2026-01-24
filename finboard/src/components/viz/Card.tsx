@@ -11,7 +11,6 @@ interface Props {
 export default function Card({ data: d, map: m }: Props) {
   const rawVal = m.val ? getVal(d, m.val) : null;
   
-  // FIX: Force the label to be a String. 
   // If the API returns a number (like -1.5), this prevents the crash.
   const rawLabel = m.lbl ? getVal(d, m.lbl) : 'Select Data';
   const label = String(rawLabel ?? ''); 
@@ -19,12 +18,12 @@ export default function Card({ data: d, map: m }: Props) {
   // Smart Formatting Logic
   const formatVal = (v: any) => {
     if (typeof v === 'number') {
-      // Check if it's a percentage (change) or price
+      // Checking if it's a percentage (change) or price
       if (label.toLowerCase().includes('change') || label.toLowerCase().includes('percent')) {
          return `${v > 0 ? '+' : ''}${v.toFixed(2)}%`;
       }
       
-      // Default: Format as Currency
+      // Default: Formatting as Currency
       return new Intl.NumberFormat('en-US', {
         style: 'currency',
         currency: 'USD',
@@ -37,7 +36,7 @@ export default function Card({ data: d, map: m }: Props) {
 
   const formattedVal = formatVal(rawVal);
   
-  // Determine Colors
+  // Determining Colors
   // We check if the Label *or* the Value indicates a "Change"
   const isChange = label.toLowerCase().includes('change') || label.toLowerCase().includes('percent');
   const isPositive = typeof rawVal === 'number' && rawVal >= 0;

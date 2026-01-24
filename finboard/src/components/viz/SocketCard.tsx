@@ -13,7 +13,7 @@ export default function SocketCard({ coin }: Props) {
   
   const ws = useRef<WebSocket | null>(null);
 
-  // Map common names to Binance tickers
+  // Mapping common names to Binance tickers
   const getTicker = (name: string) => {
     const map: Record<string, string> = {
       'bitcoin': 'btcusdt',
