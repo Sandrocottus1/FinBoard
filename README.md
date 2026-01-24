@@ -57,14 +57,13 @@ FinBoard is a responsive, feature-rich frontend application built with **Next.js
       npm install
    ```
 3. Create a .env.local file in the root directory and add your API key:
-  ```env
-      NEXT_PUBLIC_FINNHUB_API_KEY=your_api_key_here
-  ```
-
+   ```env
+       NEXT_PUBLIC_FINNHUB_API_KEY=your_api_key_here
+   ```
 4. Run the development server
-  ```bash
+   ```bash
       npm run dev
-  ```
+   ```
 
 The application will be available at:
 👉 http://localhost:3000
