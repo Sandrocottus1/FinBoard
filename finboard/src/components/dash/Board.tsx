@@ -47,17 +47,6 @@ export default function Board() {
     add({ id: `${timestamp}-0`, name: 'Live Bitcoin', type: 'socket', url: 'bitcoin', freq: 0, map: {} });
     add({ id: `${timestamp}-2`, name: 'Market Leaderboard', type: 'table', url: 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin,ethereum,solana,cardano,ripple&order=market_cap_desc', freq: 120, map: { cols: ['name', 'current_price', 'price_change_percentage_24h'] } });
     add({ id: `${timestamp}-3`, name: 'BTC Trend (30 Days)', type: 'chart', url: 'https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=30&interval=daily', freq: 300, map: { x: '0', y: '1' } });
-    add({
-      id: `stock-aapl-${timestamp}`,
-      name: 'Apple Inc.',
-      type: 'card',
-      url: `https://finnhub.io/api/v1/quote?symbol=AAPL&token=${process.env.FINNHUB_API_KEY}`,
-      freq: 60,
-      map: { 
-        value: 'c',   // Current Price
-        change: 'dp'  // Day % Change
-      } as any
-    });
   };
 
   return (
