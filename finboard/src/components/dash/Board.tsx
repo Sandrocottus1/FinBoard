@@ -51,7 +51,7 @@ export default function Board() {
       id: `stock-aapl-${timestamp}`,
       name: 'Apple Inc.',
       type: 'card',
-      url: `https://finnhub.io/api/v1/quote?symbol=AAPL&token=${process.env.NEXT_PUBLIC_FINNHUB_API_KEY}`,
+      url: `https://finnhub.io/api/v1/quote?symbol=AAPL&token=${process.env.FINNHUB_API_KEY}`,
       freq: 60,
       map: { 
         value: 'c',   // Current Price
