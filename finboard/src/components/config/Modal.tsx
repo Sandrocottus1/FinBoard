@@ -7,6 +7,7 @@ import { getApi } from '@/lib/api';
 
 interface Props {
   close: () => void;
+  onSuccess?: (name: string) => void;
 }
 
 const getKeys = (obj: any, prefix = ''): string[] => {
@@ -20,7 +21,7 @@ const getKeys = (obj: any, prefix = ''): string[] => {
   }, []);
 };
 
-export default function Modal({ close }: Props) {
+export default function Modal({ close, onSuccess }: Props) {
   const add = useStore((s) => s.add);
   const [loading, setLoading] = useState(false);
   const [keys, setKeys] = useState<string[]>([]);
@@ -36,7 +37,7 @@ export default function Modal({ close }: Props) {
   const isSocket = widget.type === 'socket';
 
   const handleTest = async () => {
-    if (!widget.url) return;
+    if (!widget.name ||!widget.url) return alert('Name and URL required');;
     setLoading(true);
     
     if (isSocket) {
@@ -71,6 +72,7 @@ export default function Modal({ close }: Props) {
       freq: widget.freq || 30,
       map: widget.map || {}
     });
+    if(onSuccess) onSuccess(widget.name);
     close();
   };
 
