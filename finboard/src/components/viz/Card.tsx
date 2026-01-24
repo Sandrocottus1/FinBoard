@@ -26,7 +26,7 @@ export default function Card({ data: d, map: m }: Props) {
   const hasChange = typeof changeVal === 'number';
 
   // 3. GET LABEL
-  const rawLabel = m.lbl ? getVal(d, m.lbl) : 'Select Data';
+  const rawLabel = m.lbl ? getVal(d, m.lbl) : 'Price';
   const label = String(rawLabel ?? '');
 
   // 4. FORMATTING LOGIC (Currency vs Number)
@@ -69,7 +69,7 @@ export default function Card({ data: d, map: m }: Props) {
     <div className="relative h-full w-full flex flex-col justify-center overflow-hidden pl-4 group">
       
       {/* Decorative Background Icon */}
-      <div className={`absolute -right-6 -bottom-6 opacity-20 rotate-[-12deg] group-hover:scale-110 transition-transform duration-500 ${bgIconColor}`}>
+      <div className={`absolute -right-1 bottom-0 opacity-20 rotate-[-12deg] group-hover:scale-110 transition-transform duration-500 ${bgIconColor}`}>
         <Icon size={100} strokeWidth={1} />
       </div>
       
