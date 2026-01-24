@@ -1,6 +1,6 @@
 'use client';
 
-// 1. ADD NEW IMPORTS
+// 1. ADDING NEW IMPORTS
 import { 
   DndContext, 
   closestCenter, 
@@ -18,7 +18,7 @@ import Widget from './Widget';
 export default function Board() {
   const { ws, reorder, add } = useStore();
 
-  // 2. DEFINE SENSORS 
+  // 2. Configure sensors with a delay to ensure touch scrolling works on mobile
   const sensors = useSensors(
     useSensor(MouseSensor), // Desktop 
     useSensor(TouchSensor, {
@@ -51,7 +51,7 @@ export default function Board() {
 
   return (
     <div className="w-full bg-white dark:bg-black transition-colors duration-300">
-      {/* 3. PASS THE SENSORS TO CONTEXT */}
+      {/* 3. PASSING THE SENSORS TO CONTEXT */}
       <DndContext 
         sensors={sensors}  
         collisionDetection={closestCenter} 

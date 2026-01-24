@@ -9,7 +9,7 @@ interface Props {
 }
 
 export default function Chart({ data, map }: Props) {
-  // Handle CoinGecko (prices array) or standard data
+  // Handling CoinGecko (prices array) or standard data
   const chartData = Array.isArray(data) 
     ? data 
     : (getVal(data, 'prices') || getVal(data, 'data') || []);
@@ -18,7 +18,7 @@ export default function Chart({ data, map }: Props) {
 
   // Formatters to make numbers look like Dates and Money
   const formatDate = (tick: any) => {
-    // If it's a timestamp (number), make it a date string
+    // If it's a timestamp (number), making it a date string
     if (typeof tick === 'number') {
       return new Date(tick).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
     }

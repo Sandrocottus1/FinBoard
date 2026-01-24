@@ -9,7 +9,7 @@ export default function ThemeToggle() {
   useEffect(() => {
     setMounted(true);
     
-    // Check localStorage first, then system preference
+    // Checking localStorage first, then system preference
     const savedTheme = localStorage.getItem('theme');
     
     if (savedTheme === 'dark') {
@@ -39,7 +39,7 @@ export default function ThemeToggle() {
     });
   };
 
-  // Prevent hydration mismatch
+  // Preventing hydration mismatch
   if (!mounted) {
     return <div className="p-2 rounded-full w-10 h-10" />;
   }
