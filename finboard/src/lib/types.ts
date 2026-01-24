@@ -13,6 +13,7 @@ export interface WCfg {
   name: string;
   type: 'card' | 'table' | 'chart' | 'socket';
   url: string;
-  freq: number;       // Refresh interval
+  freq: number;      
   map: WMap;          
+  
 }

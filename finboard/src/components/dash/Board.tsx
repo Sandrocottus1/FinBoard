@@ -5,10 +5,10 @@ import {
   DndContext, 
   closestCenter, 
   DragEndEvent,
-  useSensor,    // <--- Add this
-  useSensors,   // <--- Add this
-  MouseSensor,  // <--- Add this
-  TouchSensor   // <--- Add this
+  useSensor,    
+  useSensors,   
+  MouseSensor,  
+  TouchSensor   
 } from '@dnd-kit/core';
 
 import { SortableContext, arrayMove, rectSortingStrategy } from '@dnd-kit/sortable';
@@ -18,9 +18,9 @@ import Widget from './Widget';
 export default function Board() {
   const { ws, reorder, add } = useStore();
 
-  // 2. DEFINE SENSORS (The Fix for Mobile)
+  // 2. DEFINE SENSORS 
   const sensors = useSensors(
-    useSensor(MouseSensor), // Desktop (Instant drag)
+    useSensor(MouseSensor), // Desktop 
     useSensor(TouchSensor, {
       // Mobile Config:
       // User must hold finger for 250ms before drag starts.
@@ -47,13 +47,24 @@ export default function Board() {
     add({ id: `${timestamp}-0`, name: 'Live Bitcoin', type: 'socket', url: 'bitcoin', freq: 0, map: {} });
     add({ id: `${timestamp}-2`, name: 'Market Leaderboard', type: 'table', url: 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin,ethereum,solana,cardano,ripple&order=market_cap_desc', freq: 120, map: { cols: ['name', 'current_price', 'price_change_percentage_24h'] } });
     add({ id: `${timestamp}-3`, name: 'BTC Trend (30 Days)', type: 'chart', url: 'https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=30&interval=daily', freq: 300, map: { x: '0', y: '1' } });
+    add({
+      id: `stock-aapl-${timestamp}`,
+      name: 'Apple Inc.',
+      type: 'card',
+      url: `https://finnhub.io/api/v1/quote?symbol=AAPL&token=${process.env.NEXT_PUBLIC_FINNHUB_API_KEY}`,
+      freq: 60,
+      map: { 
+        value: 'c',   // Current Price
+        change: 'dp'  // Day % Change
+      } as any
+    });
   };
 
   return (
     <div className="w-full bg-white dark:bg-black transition-colors duration-300">
       {/* 3. PASS THE SENSORS TO CONTEXT */}
       <DndContext 
-        sensors={sensors}  // <--- Connect the sensors here
+        sensors={sensors}  
         collisionDetection={closestCenter} 
         onDragEnd={handleDragEnd}
       >
