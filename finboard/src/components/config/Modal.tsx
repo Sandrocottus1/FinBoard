@@ -277,7 +277,6 @@ export default function Modal({ close, onSuccess }: Props) {
                   </>
                )}
                
-               {/* --- NEW: TABLE COLUMN LOGIC --- */}
                {widget.type === 'table' && (
                  <div className="space-y-2">
                    <label className="text-xs text-gray-500 uppercase">Select Columns</label>
