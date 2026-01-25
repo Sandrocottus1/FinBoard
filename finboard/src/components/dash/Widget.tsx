@@ -44,7 +44,10 @@ export default function Widget({ cfg }: Props) {
         setError(false);
 
         const res = await getApi(cfg.url);
-        if (!res) throw new Error("No data");
+        if (!res) {
+          console.warn("API returned no data, retrying...");
+          return;
+        }
 
         let finalData = res;
 

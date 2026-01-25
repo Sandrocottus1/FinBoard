@@ -7,6 +7,7 @@ interface Store {
   add: (w: WCfg) => void;
   remove: (id: string) => void; 
   reorder: (ws: WCfg[]) => void;
+  setWidgets: (ws: WCfg[]) => void;
 }
 
 export const useStore = create<Store>()(
@@ -19,6 +20,7 @@ export const useStore = create<Store>()(
       remove: (id) => set((s) => ({ ws: s.ws.filter((w) => w.id !== id) })),
       
       reorder: (ws) => set({ ws }),
+      setWidgets:(newWidgets)=>set({ws:newWidgets}),
     }),
     { name: 'finboard-store' }
   )

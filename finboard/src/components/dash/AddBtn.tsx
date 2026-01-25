@@ -7,7 +7,7 @@ import Modal from '../config/Modal';
 interface Props {
   onSuccess?: (name: string) => void;
 }
-
+ 
 // 2. Accept the prop
 export default function AddBtn({ onSuccess }: Props) {
   const [open, setOpen] = useState(false);
