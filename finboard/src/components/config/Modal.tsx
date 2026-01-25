@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useStore } from '@/lib/store';
 import { WCfg } from '@/lib/types';
 import { X, Play, Plus, Loader2 } from 'lucide-react';
@@ -10,6 +10,8 @@ interface Props {
   onSuccess?: (name: string) => void;
 }
 
+const STORAGE_KEY = 'finboard-add-widget-draft';
+
 const getKeys = (obj: any, prefix = ''): string[] => {
   if (!obj || typeof obj !== 'object') return [];
   return Object.keys(obj).reduce((acc: string[], k) => {
@@ -19,6 +21,32 @@ const getKeys = (obj: any, prefix = ''): string[] => {
     }
     return [...acc, pre];
   }, []);
+};
+
+const saveWidgetDraft = (widget: Partial<WCfg>) => {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(widget));
+  } catch (e) {
+    console.error('Failed to save widget draft:', e);
+  }
+};
+
+const getWidgetDraft = (): Partial<WCfg> | null => {
+  try {
+    const draft = localStorage.getItem(STORAGE_KEY);
+    return draft ? JSON.parse(draft) : null;
+  } catch (e) {
+    console.error('Failed to get widget draft:', e);
+    return null;
+  }
+};
+
+const clearWidgetDraft = () => {
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+  } catch (e) {
+    console.error('Failed to clear widget draft:', e);
+  }
 };
 
 export default function Modal({ close, onSuccess }: Props) {
@@ -33,6 +61,14 @@ export default function Modal({ close, onSuccess }: Props) {
     freq: 30,
     map: {}
   });
+
+  // Restore draft on mount
+  useEffect(() => {
+    const draft = getWidgetDraft();
+    if (draft) {
+      setWidget(draft);
+    }
+  }, []);
 
   const isSocket = widget.type === 'socket';
 
@@ -72,6 +108,7 @@ export default function Modal({ close, onSuccess }: Props) {
       freq: widget.freq || 30,
       map: widget.map || {}
     });
+    clearWidgetDraft();
     if(onSuccess) onSuccess(widget.name);
     close();
   };
@@ -95,7 +132,11 @@ export default function Modal({ close, onSuccess }: Props) {
               className="w-full p-3 bg-gray-950 border border-gray-800 rounded-lg text-white outline-none focus:ring-2 focus:ring-blue-600"
               placeholder="e.g. Market Leaderboard"
               value={widget.name}
-              onChange={(e) => setWidget({ ...widget, name: e.target.value })}
+              onChange={(e) => {
+                const updated = { ...widget, name: e.target.value };
+                setWidget(updated);
+                saveWidgetDraft(updated);
+              }}
             />
           </div>
 
@@ -105,7 +146,11 @@ export default function Modal({ close, onSuccess }: Props) {
                 <select 
                   className="w-full p-3 bg-gray-950 border border-gray-800 rounded-lg text-white outline-none"
                   value={widget.type}
-                  onChange={(e) => setWidget({ ...widget, type: e.target.value as any, map: {} })}
+                  onChange={(e) => {
+                    const updated = { ...widget, type: e.target.value as any, map: {} };
+                    setWidget(updated);
+                    saveWidgetDraft(updated);
+                  }}
                 >
                   <option value="card">Card (Single Metric)</option>
                   <option value="table">Table (List)</option>
@@ -121,7 +166,11 @@ export default function Modal({ close, onSuccess }: Props) {
                   className="w-full p-3 bg-gray-950 border border-gray-800 rounded-lg text-white disabled:opacity-50"
                   value={isSocket ? 0 : widget.freq}
                   disabled={isSocket}
-                  onChange={(e) => setWidget({ ...widget, freq: Number(e.target.value) })}
+                  onChange={(e) => {
+                    const updated = { ...widget, freq: Number(e.target.value) };
+                    setWidget(updated);
+                    saveWidgetDraft(updated);
+                  }}
                 />
              </div>
           </div>
@@ -135,7 +184,11 @@ export default function Modal({ close, onSuccess }: Props) {
                 className="flex-1 p-3 bg-gray-950 border border-gray-800 rounded-lg text-white font-mono text-sm outline-none"
                 placeholder={isSocket ? "bitcoin" : "https://api..."}
                 value={widget.url}
-                onChange={(e) => setWidget({ ...widget, url: e.target.value })}
+                onChange={(e) => {
+                  const updated = { ...widget, url: e.target.value };
+                  setWidget(updated);
+                  saveWidgetDraft(updated);
+                }}
               />
               {!isSocket && (
                   <button 
@@ -158,14 +211,30 @@ export default function Modal({ close, onSuccess }: Props) {
                  <>
                    <div>
                      <label className="text-xs text-gray-500 uppercase">Label Field</label>
-                     <select className="w-full p-2 bg-gray-900 rounded border border-gray-800 text-sm text-gray-300" onChange={(e) => setWidget({...widget, map: {...widget.map, lbl: e.target.value}})}>
+                     <select 
+                       className="w-full p-2 bg-gray-900 rounded border border-gray-800 text-sm text-gray-300" 
+                       value={widget.map?.lbl || ''}
+                       onChange={(e) => {
+                         const updated = {...widget, map: {...widget.map, lbl: e.target.value}};
+                         setWidget(updated);
+                         saveWidgetDraft(updated);
+                       }}
+                     >
                         <option value="">-- Select --</option>
                         {keys.map(k => <option key={k} value={k}>{k}</option>)}
                      </select>
                    </div>
                    <div>
                      <label className="text-xs text-gray-500 uppercase">Value Field</label>
-                     <select className="w-full p-2 bg-gray-900 rounded border border-gray-800 text-sm text-gray-300" onChange={(e) => setWidget({...widget, map: {...widget.map, val: e.target.value}})}>
+                     <select 
+                       className="w-full p-2 bg-gray-900 rounded border border-gray-800 text-sm text-gray-300" 
+                       value={widget.map?.val || ''}
+                       onChange={(e) => {
+                         const updated = {...widget, map: {...widget.map, val: e.target.value}};
+                         setWidget(updated);
+                         saveWidgetDraft(updated);
+                       }}
+                     >
                         <option value="">-- Select --</option>
                         {keys.map(k => <option key={k} value={k}>{k}</option>)}
                      </select>
@@ -177,14 +246,30 @@ export default function Modal({ close, onSuccess }: Props) {
                   <>
                    <div>
                      <label className="text-xs text-gray-500 uppercase">X Axis (Time)</label>
-                     <select className="w-full p-2 bg-gray-900 rounded border border-gray-800 text-sm text-gray-300" onChange={(e) => setWidget({...widget, map: {...widget.map, x: e.target.value}})}>
+                     <select 
+                       className="w-full p-2 bg-gray-900 rounded border border-gray-800 text-sm text-gray-300" 
+                       value={widget.map?.x || ''}
+                       onChange={(e) => {
+                         const updated = {...widget, map: {...widget.map, x: e.target.value}};
+                         setWidget(updated);
+                         saveWidgetDraft(updated);
+                       }}
+                     >
                         <option value="">-- Select --</option>
                         {keys.map(k => <option key={k} value={k}>{k}</option>)}
                      </select>
                    </div>
                    <div>
                      <label className="text-xs text-gray-500 uppercase">Y Axis (Price)</label>
-                     <select className="w-full p-2 bg-gray-900 rounded border border-gray-800 text-sm text-gray-300" onChange={(e) => setWidget({...widget, map: {...widget.map, y: e.target.value}})}>
+                     <select 
+                       className="w-full p-2 bg-gray-900 rounded border border-gray-800 text-sm text-gray-300" 
+                       value={widget.map?.y || ''}
+                       onChange={(e) => {
+                         const updated = {...widget, map: {...widget.map, y: e.target.value}};
+                         setWidget(updated);
+                         saveWidgetDraft(updated);
+                       }}
+                     >
                         <option value="">-- Select --</option>
                         {keys.map(k => <option key={k} value={k}>{k}</option>)}
                      </select>
@@ -208,7 +293,9 @@ export default function Modal({ close, onSuccess }: Props) {
                              const newCols = e.target.checked 
                                ? [...current, k] 
                                : current.filter((c: string) => c !== k);
-                             setWidget({...widget, map: {...widget.map, cols: newCols}});
+                             const updated = {...widget, map: {...widget.map, cols: newCols}};
+                             setWidget(updated);
+                             saveWidgetDraft(updated);
                            }}
                          />
                          <span className="truncate" title={k}>{k}</span>
