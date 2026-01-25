@@ -34,10 +34,8 @@ export default function Home() {
         <Board />
       </div>
       
-      {/* 4. Pass the trigger to AddBtn */}
       <AddBtn onSuccess={handleWidgetAdded} />
 
-      {/* 5. Render the Notification Component */}
       <Notification 
         message={notify.msg} 
         isVisible={notify.show} 
