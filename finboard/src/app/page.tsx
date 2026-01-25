@@ -1,4 +1,4 @@
-'use client'; // 👈 1. Necessary for useState
+'use client'; 
 import { useState } from 'react';
 import Board from '@/components/dash/Board';
 import AddBtn from '@/components/dash/AddBtn';
