@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
+// Correct import for Next.js App Router
+import { Analytics } from "@vercel/analytics/next"; 
 
 export const metadata: Metadata = {
   title: "FinBoard",
@@ -25,6 +27,8 @@ export default function RootLayout({
       </head>
       <body className="bg-gray-100 dark:bg-black text-gray-900 dark:text-gray-100 min-h-screen transition-colors duration-300">
         {children}
+        {/* Analytics component placed here */}
+        <Analytics />
       </body>
     </html>
   );
