@@ -48,7 +48,7 @@ export default function Notification({message, isVisible, onClose}: Props) {
           {message}
         </span>
 
-        {/* Close Button (Optional) */}
+        {/* Close Button */}
         <button onClick={() => setShow(false)} className="ml-2 hover:bg-white/10 rounded-full p-1 transition-colors">
             <X size={14} className="text-gray-400" />
         </button>

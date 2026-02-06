@@ -1,4 +1,4 @@
-'use client'; // 👈 1. Necessary for useState
+'use client'; 
 import { useState } from 'react';
 import Board from '@/components/dash/Board';
 import AddBtn from '@/components/dash/AddBtn';
@@ -34,10 +34,8 @@ export default function Home() {
         <Board />
       </div>
       
-      {/* 4. Pass the trigger to AddBtn */}
       <AddBtn onSuccess={handleWidgetAdded} />
 
-      {/* 5. Render the Notification Component */}
       <Notification 
         message={notify.msg} 
         isVisible={notify.show} 

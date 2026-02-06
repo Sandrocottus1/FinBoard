@@ -87,7 +87,6 @@ export default function Card({ data: d, map: m }: Props) {
           {formattedVal || '--'}
         </span>
 
-        {/* SMALL CHANGE % (Colored) */}
         {hasChange && (
           <div className={`flex items-center gap-1 text-sm font-bold mt-1 ${statusColor}`}>
             {isPositive ? '+' : ''}{changeVal}%
