@@ -1,6 +1,8 @@
 # 🚀 FinBoard - Real-Time Financial Dashboard
 
-[![Live Demo](https://img.shields.io/badge/Live_Demo-Vercel-black?style=for-the-badge&logo=vercel)](https://fin-board-theta.vercel.app/)
+[![Live Demo](https://img.shields.io/badge/Live_Demo-Vercel-black?style=for-the-badge&logo=vercel)]
+
+**🌐 Live Site:** [https://fin-board-theta.vercel.app/](https://fin-board-theta.vercel.app/)
 
 > **A high-performance, customizable dashboard for tracking crypto and stock markets in real-time.**
 
